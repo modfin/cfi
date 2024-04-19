@@ -114,24 +114,11 @@ func Valid(cfi string) bool {
 	return true
 }
 
-// SoftValid returns true if the CFI string, but allows all attributes to be X
-func SoftValid(cfi string) bool {
+// ValidCG returns true if the CFI string has a valid Category / Group combination
+func ValidCG(cfi string) bool {
 	if len(cfi) != 6 {
 		return false
 	}
 	_, ok := validCFI[cfi[0:2]]
-	if !ok {
-		return false
-	}
-
-	//for i, c := range cfi[2:] {
-	//	if c == 'X' {
-	//		continue
-	//	}
-	//	if strings.IndexByte(attributes[i], cfi[i+2]) == -1 {
-	//		return false
-	//	}
-	//}
-
-	return true
+	return ok
 }

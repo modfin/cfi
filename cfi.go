@@ -2,6 +2,8 @@ package cfi
 
 import (
 	"fmt"
+	"regexp"
+	"strings"
 )
 
 // https://en.wikipedia.org/wiki/ISO_10962
@@ -9,7 +11,7 @@ import (
 // From takes a cfi token, validates it and decorates it named Category, Group and Attributes
 func From(cfi string) (CFI, error) {
 
-	if !SoftValid(cfi) {
+	if !ValidCG(cfi) {
 		return CFI{}, fmt.Errorf("CFI %s is not valid", cfi)
 	}
 
@@ -18,7 +20,27 @@ func From(cfi string) (CFI, error) {
 	}, nil
 }
 
+var noncfichars = regexp.MustCompile("[^A-Z]")
+
+// New takes a cfi token, but does not validate it (however it will make it into a tag, eg. supplying "EP" will result in "EPXXXX")
+func New(cfi string) CFI {
+
+	padRight := func(str, pad string, lenght int) string {
+		for {
+			str += pad
+			if len(str) > lenght {
+				return str[0:lenght]
+			}
+		}
+	}
+
+	return CFI{
+		tag: noncfichars.ReplaceAllString(padRight(strings.ToUpper(cfi), "X", 6), "X"),
+	}
+}
+
 var NA = map[rune]string{
+	'_': "N/A",
 	'X': "N/A",
 }
 
